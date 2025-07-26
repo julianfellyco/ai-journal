@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Journal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Daily Journal</h1>
+    <textarea id="entry" placeholder="Write your thoughts here..."></textarea>
+    
+    <label for="mood">Mood: </label>
+    <select id="mood">
+      <option value="happy">😊 Happy</option>
+      <option value="neutral">😐 Neutral</option>
+      <option value="sad">😢 Sad</option>
+    </select>
 
+    <button id="saveBtn">Save Entry</button>
+    <button id="summarizeBtn">Summarize with AI</button>
+
+    <div id="summary"></div>
+    <canvas id="moodChart" width="400" height="200"></canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
