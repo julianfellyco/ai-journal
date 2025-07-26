@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Journal</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Daily Journal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
 </head>
-<body>
-  <div class="container">
-    <h1>📝 Daily Journal</h1>
-    <textarea id="entry" placeholder="Write your thoughts here..."></textarea>
-    
-    <label for="mood">Mood: </label>
-    <select id="mood">
-      <option value="happy">😊 Happy</option>
-      <option value="neutral">😐 Neutral</option>
-      <option value="sad">😢 Sad</option>
-    </select>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div class="max-w-2xl mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4 text-center">📝 AI Daily Journal</h1>
 
-    <button id="saveBtn">Save Entry</button>
-    <button id="summarizeBtn">Summarize with AI</button>
+    <textarea id="entry" rows="6" class="w-full p-4 rounded border dark:bg-gray-800" placeholder="Write your thoughts..."></textarea>
 
-    <div id="summary"></div>
-    <canvas id="moodChart" width="400" height="200"></canvas>
+    <button id="submit" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">Save Entry</button>
+
+    <div class="mt-6">
+      <h2 class="text-xl font-semibold mb-2">🧠 AI Summary</h2>
+      <p id="summary" class="bg-white dark:bg-gray-800 p-4 rounded min-h-[100px]"></p>
+    </div>
+
+    <canvas id="moodChart" class="mt-8 bg-white dark:bg-gray-800 rounded p-4" height="200"></canvas>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
