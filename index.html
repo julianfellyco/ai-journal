@@ -1,32 +1,88 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Daily Journal</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Journal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = { darkMode: 'class' }
+    tailwind.config = { darkMode: 'class' };
   </script>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-  <div class="max-w-2xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4 text-center">📝 AI Daily Journal</h1>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen p-6 transition">
 
-    <textarea id="entry" rows="6" class="w-full p-4 rounded border dark:bg-gray-800" placeholder="Write your thoughts..."></textarea>
-
-    <button id="submit" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">Save Entry</button>
-
-    <div class="mt-6">
-      <h2 class="text-xl font-semibold mb-2">🧠 AI Summary</h2>
-      <p id="summary" class="bg-white dark:bg-gray-800 p-4 rounded min-h-[100px]"></p>
+  <div class="max-w-xl mx-auto">
+    <div class="flex justify-between mb-4">
+      <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">📝 My AI Journal</h1>
+      <button id="toggleTheme" class="text-sm px-2 py-1 rounded bg-gray-200 dark:bg-gray-700">
+        🌙 Dark Mode
+      </button>
     </div>
 
-    <canvas id="moodChart" class="mt-8 bg-white dark:bg-gray-800 rounded p-4" height="200"></canvas>
+    <textarea id="entry" rows="5" class="w-full p-3 rounded border dark:bg-gray-800 dark:border-gray-600" placeholder="Write something..."></textarea>
+    <button id="submitBtn" class="mt-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Summarize</button>
+
+    <div class="mt-4">
+      <h2 class="font-semibold mb-2">🧠 Summary:</h2>
+      <pre id="output" class="bg-gray-200 dark:bg-gray-800 p-3 rounded whitespace-pre-wrap"></pre>
+    </div>
+
+    <div class="mt-6">
+      <h2 class="font-semibold mb-2">📓 My Entries:</h2>
+      <div id="entries" class="space-y-3 text-sm"></div>
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+  <script>
+    const toggleBtn = document.getElementById('toggleTheme');
+    toggleBtn.onclick = () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+      toggleBtn.textContent = document.body.classList.contains('dark') ? '🌞 Light Mode' : '🌙 Dark Mode';
+    };
+
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark');
+      toggleBtn.textContent = '🌞 Light Mode';
+    }
+
+    const saveEntry = (text) => {
+      const all = JSON.parse(localStorage.getItem('journal') || '[]');
+      all.unshift({ text, date: new Date().toISOString() });
+      localStorage.setItem('journal', JSON.stringify(all));
+    };
+
+    const loadEntries = () => {
+      const container = document.getElementById('entries');
+      const list = JSON.parse(localStorage.getItem('journal') || '[]');
+      container.innerHTML = '';
+      list.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'bg-gray-100 dark:bg-gray-700 p-2 rounded';
+        div.innerHTML = `<strong>${new Date(entry.date).toLocaleString()}</strong><br>${entry.text}`;
+        container.appendChild(div);
+      });
+    };
+
+    document.getElementById('submitBtn').onclick = async () => {
+      const prompt = document.getElementById('entry').value;
+      if (!prompt.trim()) return;
+
+      saveEntry(prompt);
+      loadEntries();
+
+      const res = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await res.json();
+      document.getElementById('output').textContent =
+        data.choices?.[0]?.message?.content || 'No response';
+    };
+
+    window.onload = loadEntries;
+  </script>
 </body>
 </html>
