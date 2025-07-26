@@ -1,31 +1,25 @@
-const express = require('express');
-const fetch = require('node-fetch');
+// File: api/openai.js
+import { OpenAI } from 'openai';
 
-const app = express();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-app.use(express.json());
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
-app.post('/api/openai', async (req, res) => {
   const { prompt } = req.body;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }]
-      })
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant that summarizes journal entries.' },
+        { role: 'user', content: prompt }
+      ]
     });
 
-    const data = await response.json();
-    res.status(200).json(data);
-  } catch (err) {
-    res.status(500).json({ error: 'OpenAI request failed' });
+    res.status(200).json(completion);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong' });
   }
-});
-
-module.exports = app;
+}
